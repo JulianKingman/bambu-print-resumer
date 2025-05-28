@@ -75,6 +75,24 @@ def main():
         else:
             print("Invalid input or out of bounds.")
 
+    print(f"Try Home Z-axis (beta)?")
+    choice = input("Yes (y), No (n)? ").strip().lower()
+    if choice == 'y' or choice == 'yes':
+        home = True
+    else:
+        home = False
+
+    if home == True:
+        while True:
+            home_x = float(input(f"Enter X position for homing (in mm): ").strip())
+            home_y = float(input(f"Enter Y position for homing (in mm): ").strip())
+            print(f"Confirm X: {home_x}mm Y: {home_y}mm")
+            choice = input("Yes (y), No (n)? ").strip().lower()
+            if choice == 'y' or choice == 'yes':
+                break
+
+        
+
     start_idx = layers[chosen_idx][0]
 
     resume_block = [
@@ -102,6 +120,33 @@ def main():
         'G92 E0\n',
     ]
 
+    resume_block_home = [
+        '; --- Resume print after failure ---\n',
+        'M140 S65\n',
+        'M104 S220\n',
+        'M190 S65\n',
+        'M109 S220\n',
+        'M1002 set_gcode_claim_speed_level : 5\n',
+        'M975 S1\n',
+        'M981 S1 P20000\n',
+        'M412 S1\n',
+        'M73 P0 R300\n',
+        'M106 P2 S100\n',
+        'M106 P3 S180\n',
+        'M221 X0 Y0 Z0\n',
+        'G90\n',
+        'M83\n',
+        'G28 X Y\n',
+        f'G1 X{home_x} Y{home_y}\n',
+        'G28 Z\n',
+        f'G1 Z{layers[chosen_idx][1] + 10}\n',
+        'G1 X125 Y125 F6000\n',
+        f'G1 Z{layers[chosen_idx][1]} F300\n',
+        'G92 E0\n',
+        'G1 E5 F300\n',
+        'G92 E0\n',
+    ]
+
     remainder = lines[start_idx:]
     cleaned_remainder = clean_wipe_sections(remainder)
 
@@ -114,7 +159,10 @@ def main():
         f.write('\n')
         f.writelines(config)
         f.write('\n')
-        f.writelines(resume_block)
+        if home:
+            f.writelines(resume_block_home)
+        else:
+            f.writelines(resume_block)
         f.write('\n')
         f.writelines(cleaned_remainder)
 

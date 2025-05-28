@@ -13,5 +13,5 @@ python ResumeBambuGcode.py
 6. It's worthwhile opening the GCODE file in bambu studio to make sure it looks correct before printing
 7. Save the new GCODE file to your micro SD card, put it directly into the bambu printer, and print!
 
-# Issues
-If the z-height isn't correctly calibrated, it might go to the wrong spot and run into your print. I have an idea to fix this (basically an option that allows you to home your z-axis in a safe area of the print bed).
+# Home Z-Axis (Beta)
+If the z-height isn't correctly calibrated, the printer might start printing above the print or knock the print of the bed. This option alows you to home the Z axis at a custom XY position on the bed hopefully avoiding the print. Minimal testing has done on this feature.
